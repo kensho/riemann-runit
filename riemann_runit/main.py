@@ -50,19 +50,16 @@ class ParseToRiemann(object):
 				if len(data[service_name]) > self.limit:
 					data[service_name].pop()
 		
-
-		return data
-
 	def alive_or_dead():
 		status = dict()
 		for k, v, in data.iteritems():
 			if len(data[k]) > 1:
 				status[k] = data[k][-1] - data[k][-2] > self.interval
-			else:
+			else
 				status[k] = True
 			
 	def collect_and_emit(self):
-		self.parse_and_update
+		self.parse_and_update()
 		self.status = self.alive_or_dead()
 
 		from riemann_client.transport import TCPTransport
