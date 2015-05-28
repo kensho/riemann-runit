@@ -1,0 +1,8 @@
+run: /etc/service/cron: (pid 122) 5606099s
+run: /etc/service/flask: (pid 120) 5606099s
+run: /etc/service/logstash_forwarder: (pid 121) 0s
+run: /etc/service/queue: (pid 119) 5606099s
+run: /etc/service/redis: (pid 111) 5606099s
+run: /etc/service/riemann-health: (pid 123) 5606099s
+run: /etc/service/sshd: (pid 113) 5606099s
+run: /etc/service/syslog-ng: (pid 112) 10s
