@@ -54,7 +54,7 @@ class ParseToRiemann(object):
 		status = dict()
 		for k, v in data.iteritems():
 			if len(data[k]) > 1:
-				status[k] = data[k][-1] - data[k][-2] > self.interval
+				status[k] = data[k][-1] - data[k][-2] > self.interval + 1
 			else
 				status[k] = True
 			
@@ -67,7 +67,7 @@ class ParseToRiemann(object):
 
 		with QueuedClient(TCPTransport(self.host, int(self.port))) as client:
 			for k, v in self.status.iteritems():
-				client.event(service = k, status = v, metric_f = new_metric[k], host = self.syshost)
+				client.event(service = k, state = v, metric_f = new_metric[k], host = self.syshost)
 			client.flush()
 
 		threading.Timer(self.interval, self.main).start()
