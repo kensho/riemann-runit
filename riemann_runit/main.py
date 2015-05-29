@@ -26,7 +26,7 @@ class ParseToRiemann(object):
 
 	def grab():
 		if not self.directory.endswith('/*')
-			self.directory = self.directory + '/*'
+			self.directory.append('/*')
 		args = ['sv', 'status', self.directory]
 
 		return subprocess.check_output(args).split('\n')
@@ -52,7 +52,7 @@ class ParseToRiemann(object):
 		
 	def alive_or_dead():
 		status = dict()
-		for k, v, in data.iteritems():
+		for k, v in data.iteritems():
 			if len(data[k]) > 1:
 				status[k] = data[k][-1] - data[k][-2] > self.interval
 			else
@@ -73,14 +73,14 @@ class ParseToRiemann(object):
 		threading.Timer(self.interval, self.main).start()
 
 @click.command()
-@click.option('--host' ,'-h',       default ='127.0.0.1',       help = 'The riemann host')
-@click.option('--timeout', '-m',    default = '5',              help = 'The timeout time')
-@click.option('--port', '-p',       default = '5555',           help = 'The riemann port')
-@click.option('--event-host', '-e', default = '',               help = 'Event hostname')
-@click.option('--interval', '-i',   default ='5',               help = 'Seconds between updates')
-@click.option('--procs',            default = '',               help = 'Filters services')
-@click.option('--directory', '-d',  default = '/etc/service/',  help = 'Directory')
-@click.option('--limit', '-l',      default = '100',            help = 'Max number of historical data to store')
+@click.option('--host' ,'-h', default ='127.0.0.1', help = 'The riemann host')
+@click.option('--timeout', '-m', default = '5', help = 'The timeout time')
+@click.option('--port', '-p', default = '5555', help = 'The riemann port')
+@click.option('--event-host','-e', default = '', help = 'Event hostname')
+@click.option('--interval', '-i', default ='5', help = 'Seconds between updates')
+@click.option('--procs', default = '', help = 'Filters services')
+@click.option('--directory', '-d', default = '/etc/service/', help = 'Directory')
+@click.option('--limit', '-l', default = '100', help = 'Max number of historical data to store')
 def main_cli(timeout, interval, procs, directory, host, port, limit):
     parser = ParseToRiemann(timeout, interval, procs, directory, host, port, limit)
     parser.collect_and_emit()
