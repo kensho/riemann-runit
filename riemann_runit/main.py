@@ -1,5 +1,4 @@
 from collections import defaultdict
-import time
 import threading
 import subprocess
 import socket
@@ -19,19 +18,19 @@ class ParseToRiemann(object):
 		self.limit = limit
 		self.syshost = socket.gethostname()
 
-		self.metric = parse(self.procs, self.directory)
+		self.metric = self.parse(self.procs, self.directory)
 		self.status = dict()
 		self.data   = defaultdict(list) 
 		self.max_time_running = defaultdict(lambda: 0)
 
-	def grab():
-		if not self.directory.endswith('/*')
+	def grab(self):
+		if not self.directory.endswith('/*'):
 			self.directory.append('/*')
 		args = ['sv', 'status', self.directory]
 
 		return subprocess.check_output(args).split('\n')
 
-	def parse_and_update():
+	def parse_and_update(self):
 		output = self.grab()
 		
 		for line in output:
@@ -39,27 +38,34 @@ class ParseToRiemann(object):
 			if len(split_by_space) == 0:
 				continue
 
-			if service_name in self.procs or len(self.procs) == 0:
-				service_name = split_by_space[1].split('/')[-1]
-				time_running = int(split_by_space[-1].replace('s', ''))
+			service_name = split_by_space[1].split('/')[-1]
+			time_running = int(split_by_space[-1].replace('s', ''))
 
-				data[service_name].append(time_running)
-				if time_running > max_time_running[service_name]:
-					max_time_running[service_name] = time_running
+			if service_name in self.procs or len(self.procs) == 0:				
+				self.data[service_name].append(time_running)
 
-				if len(data[service_name]) > self.limit:
-					data[service_name].pop()
+				if time_running > self.max_time_running[service_name]:
+					self.max_time_running[service_name] = time_running
+
+				if len(self.data[service_name]) > self.limit:
+					self.data[service_name].pop()
+
+		new_times_running = dict()
+		for k, v in self.data:
+			new_times_running[k] = v[-1]
+
+		return new_times_running
 		
-	def alive_or_dead():
+	def alive_or_dead(self):
 		status = dict()
-		for k, v in data.iteritems():
-			if len(data[k]) > 1:
-				status[k] = data[k][-1] - data[k][-2] > self.interval + 1
-			else
+		for k, v in self.data.iteritems():
+			if len(self.data[k]) > 1:
+				status[k] = self.data[k][-1] - self.data[k][-2] > self.interval + 1
+			else:
 				status[k] = True
 			
 	def collect_and_emit(self):
-		self.parse_and_update()
+		new_times_running = self.parse_and_update()
 		self.status = self.alive_or_dead()
 
 		from riemann_client.transport import TCPTransport
@@ -67,7 +73,7 @@ class ParseToRiemann(object):
 
 		with QueuedClient(TCPTransport(self.host, int(self.port))) as client:
 			for k, v in self.status.iteritems():
-				client.event(service = k, state = v, metric_f = new_metric[k], host = self.syshost)
+				client.event(service = k, state = v, metric_f = new_times_running[k], host = self.syshost)
 			client.flush()
 
 		threading.Timer(self.interval, self.main).start()
