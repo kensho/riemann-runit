@@ -80,10 +80,11 @@ class ParseToRiemann(object):
                 send_service = "{service_name}{delimiter}{proc_name}".format(service_name=self.service_name,
                                                                             delimiter=self.delimiter, proc_name=k)
                 print(self.client.send(
-                    dict(service=send_service, state="ok" if v else "warning",
+                    dict(service=send_service, state="ok" if v else "alert",
                         metric=new_times_running[k], host=self.syshost,
                         ttl=600)))
 
+    def run(self):
         threading.Timer(int(self.interval), self.collect_and_emit).start()
 
 
@@ -95,10 +96,10 @@ class ParseToRiemann(object):
 @click.option('--procs', default='', help='Filters services')
 @click.option('--directory', '-d', default='/etc/service/', help='Directory')
 @click.option('--limit', '-l', default='100', help='Max number of historical data to store')
-@click.option('--service_name', '-s', help = 'Service name')
+@click.option('--service_name', '-s', default='sv.proc' help = 'Service name')
 def main_cli(timeout, interval, procs, directory, host, port, limit, service_name):
     parser = ParseToRiemann(timeout, interval, procs, directory, host, port, limit, service_name)
-    parser.collect_and_emit()
+    parser.run()
 
 
 if __name__ == '__main__':
