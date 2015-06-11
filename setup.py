@@ -10,6 +10,15 @@
 
 from setuptools import setup, find_packages
 from riemann_runit import __version__
+from pip.req import parse_requirements
+from pip.download import PipSession
+
+# parse_requirements() returns generator of pip.req.InstallRequirement objects
+install_reqs = parse_requirements('riemann_runit/requirements.txt', session=PipSession())
+
+# reqs is a list of requirement
+reqs = [str(ir.req) for ir in install_reqs]
+
 
 tests_require = [
     'mock',
@@ -46,17 +55,14 @@ Riemann runit collector
     ],
     packages=find_packages(),
     include_package_data=False,
-    install_requires=[
-        # add your dependencies here
-        # remember to use 'package-name>=x.y.z,<x.y+1.0' notation (this way you get bugfixes)
-    ],
+    install_requires=reqs,
     extras_require={
         'tests': tests_require,
     },
     entry_points={
         'console_scripts': [
             # add cli scripts here in this form:
-            # 'riemann-runit=riemann_runit.cli:main',
+           'riemann-runit=riemann_runit.main:main_cli',
         ],
     },
 )

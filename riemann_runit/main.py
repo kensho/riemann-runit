@@ -71,7 +71,7 @@ class ParseToRiemann(object):
 
         return status
 
-    def collect_and_emit(self):
+    def run(self):
         new_times_running = self.parse_and_update()
         self.status = self.alive_or_dead()
 
@@ -83,9 +83,7 @@ class ParseToRiemann(object):
                     dict(service=send_service, state="ok" if v else "alert",
                         metric=new_times_running[k], host=self.syshost,
                         ttl=600)))
-
-    def run(self):
-        threading.Timer(int(self.interval), self.collect_and_emit).start()
+        threading.Timer(int(self.interval), self.run).start()
 
 
 @click.command()
