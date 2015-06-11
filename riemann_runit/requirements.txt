@@ -1,0 +1,4 @@
+bernhard==0.2.3
+click==3.3
+protobuf==2.6.1
+riemann-client==6.0.2
