@@ -25,7 +25,7 @@ class ParseToRiemann(object):
         self.data = defaultdict(list)
         self.max_time_running = defaultdict(lambda: 0)
         self.service_name = service_name
-        self.delimiter = '.' if self.service_name.contains('.') else '/'
+        self.delimiter = '.' if '.' in self.service_name else '/'
 
     def grab(self):
         if not self.directory.endswith('/*'):
@@ -67,7 +67,7 @@ class ParseToRiemann(object):
     def alive_or_dead(self):
         status = dict()
         for k, v in self.data.iteritems():
-            status[k] = True if len(self.data[k] <= 1) else (self.data[k][-1] - self.data[k][-2] > self.interval - 1)
+            status[k] = True if len(self.data[k]) <= 1 else (self.data[k][-1] - self.data[k][-2] > self.interval - 1)
 
         return status
 
@@ -96,7 +96,7 @@ class ParseToRiemann(object):
 @click.option('--procs', default='', help='Filters services')
 @click.option('--directory', '-d', default='/etc/service/', help='Directory')
 @click.option('--limit', '-l', default='100', help='Max number of historical data to store')
-@click.option('--service_name', '-s', default='sv.proc' help = 'Service name')
+@click.option('--service_name', '-s', default='sv.proc', help = 'Service name')
 def main_cli(timeout, interval, procs, directory, host, port, limit, service_name):
     parser = ParseToRiemann(timeout, interval, procs, directory, host, port, limit, service_name)
     parser.run()
