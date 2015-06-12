@@ -22,6 +22,7 @@ class ParseToRiemann(object):
 
         self.metric = defaultdict(lambda: 0)
         self.status = dict()
+        self.current_status = dict()
         self.data = defaultdict(list)
         self.max_time_running = defaultdict(lambda: 0)
         self.service_name = service_name
@@ -48,6 +49,8 @@ class ParseToRiemann(object):
 
                 service_name = split_by_space[1].split('/')[-1]
                 time_running = int(split_by_space[-1].replace('s', ''))
+                self.current_status[service_name] = split_by_space[0].startswith("run")
+
                 if service_name in self.procs or len(self.procs) <= 1:
                     self.data[service_name].append(int(time_running))
 
@@ -67,7 +70,10 @@ class ParseToRiemann(object):
     def alive_or_dead(self):
         status = dict()
         for k, v in self.data.iteritems():
-            status[k] = True if len(self.data[k]) <= 1 else (self.data[k][-1] - self.data[k][-2] > self.interval - 1)
+            if not self.current_status[k]:
+                status[k] = False
+            else:
+                status[k] = True if len(self.data[k]) <= 1 else (self.data[k][-1] - self.data[k][-2] > self.interval - 1)
 
         return status
 
