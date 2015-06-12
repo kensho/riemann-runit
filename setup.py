@@ -11,10 +11,12 @@
 from setuptools import setup, find_packages
 from riemann_runit import __version__
 from pip.req import parse_requirements
-from pip.download import PipSession
+try:
+    from pip.download import PipSession
+    install_reqs = parse_requirements('riemann_runit/requirements.txt', session=PipSession())
+except ImportError:
+    install_reqs = parse_requirements('riemann_runit/requirements.txt')
 
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('riemann_runit/requirements.txt', session=PipSession())
 
 # reqs is a list of requirement
 reqs = [str(ir.req) for ir in install_reqs]
