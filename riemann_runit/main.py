@@ -4,9 +4,12 @@ import subprocess
 import socket
 import glob
 import shlex
+import re
 
 import click
 from bernhard import Client
+
+TIME_ALIVE_RE = re.compile('([0-9]+)s')
 
 class ParseToRiemann(object):
     def __init__(self, timeout, interval, procs, directory, host, port, limit, service_name):
@@ -48,7 +51,7 @@ class ParseToRiemann(object):
                     continue
 
                 service_name = split_by_space[1].split('/')[-1]
-                time_running = int(split_by_space[-1].replace('s', ''))
+                time_running = TIME_ALIVE_RE.findall(line)[0]
                 self.current_status[service_name] = split_by_space[0].startswith("run")
 
                 if service_name in self.procs or len(self.procs) <= 1:
