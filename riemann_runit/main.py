@@ -79,10 +79,10 @@ class ParseToRiemann(object):
             for k, v in self.status.iteritems():
                 send_service = "{service_name}{delimiter}{proc_name}".format(service_name=self.service_name,
                                                                             delimiter=self.delimiter, proc_name=k)
-                print(self.client.send(
+                self.client.send(
                     dict(service=send_service, state="ok" if v else "alert",
                         metric=new_times_running[k], host=self.syshost,
-                        ttl=600)))
+                        ttl=600))
         threading.Timer(int(self.interval), self.run).start()
 
 
