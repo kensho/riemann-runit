@@ -63,7 +63,7 @@ class ParseToRiemann(object):
                     if len(self.data[service_name]) > self.limit:
                         self.data[service_name].pop()
 
-            except:
+            except (KeyError, TypeError) as e:
                 continue
 
         new_times_running = {k: v[-1] for k, v in self.data.iteritems()}
