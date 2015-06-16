@@ -52,7 +52,7 @@ class ParseToRiemann(object):
 
                 service_name = split_by_space[1].split('/')[-1]
                 time_running = TIME_ALIVE_RE.findall(line)[0]
-                self.current_status[service_name] = split_by_space[0].startswith("run")
+                self.current_status[service_name] = split_by_space[0].startswith('run')
 
                 if service_name in self.procs or len(self.procs) <= 1:
                     self.data[service_name].append(int(time_running))
@@ -86,12 +86,13 @@ class ParseToRiemann(object):
 
         if self.status:
             for k, v in self.status.iteritems():
-                send_service = "{service_name}{delimiter}{proc_name}".format(service_name=self.service_name,
-                                                                            delimiter=self.delimiter, proc_name=k)
+                send_service = '{service_name}{delimiter}{proc_name}'.format(service_name=self.service_name,
+                                                                             delimiter=self.delimiter, proc_name=k)
                 self.client.send(
-                    dict(service=send_service, state="ok" if v else "alert",
-                        metric=new_times_running[k], host=self.syshost,
-                        ttl=600))
+                    dict(service=send_service, state='ok' if v else 'critical',
+                         metric=new_times_running[k], host=self.syshost,
+                         ttl=600))
+
         threading.Timer(int(self.interval), self.run).start()
 
 
@@ -103,7 +104,7 @@ class ParseToRiemann(object):
 @click.option('--procs', default='', help='Filters services')
 @click.option('--directory', '-d', default='/etc/service/', help='Directory')
 @click.option('--limit', '-l', default='100', help='Max number of historical data to store')
-@click.option('--service_name', '-s', default='sv.proc', help = 'Service name')
+@click.option('--service-name', '-s', default='sv.proc', help = 'Service name')
 def main_cli(timeout, interval, procs, directory, host, port, limit, service_name):
     parser = ParseToRiemann(timeout, interval, procs, directory, host, port, limit, service_name)
     parser.run()
