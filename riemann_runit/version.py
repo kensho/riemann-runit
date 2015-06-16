@@ -8,4 +8,4 @@
 # http://www.opensource.org/licenses/MIT-license
 # Copyright (c) 2015, Ashok Rao <ops@kensho.com>
 
-__version__ = '0.1.0'  # NOQA
+__version__ = '0.1.4'  # NOQA
