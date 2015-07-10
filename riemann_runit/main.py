@@ -108,7 +108,7 @@ class ParseToRiemann(object):
 @click.option('--service-name', '-s', default='sv.proc', help = 'Service name')
 @click.option('--attribute', '-a', multiple=True, help='Any attributes you want to add homie')
 def main_cli(timeout, interval, procs, directory, host, port, limit, service_name, attribute):
-    attributes = dict(map(lambda x: (x.split('=')[0], x.split('=')[1]), attribute))
+    attributes = dict(map(lambda x: x.strip().split('='), attribute))
     parser = ParseToRiemann(timeout, interval, procs, directory, host, port, limit, service_name, attributes)
     parser.run()
 
