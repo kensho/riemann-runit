@@ -12,7 +12,7 @@ from bernhard import Client
 TIME_ALIVE_RE = re.compile('([0-9]+)s')
 
 class ParseToRiemann(object):
-    def __init__(self, timeout, interval, procs, directory, host, port, limit, service_name):
+    def __init__(self, timeout, interval, procs, directory, host, port, limit, service_name, attributes=None):
         self.timeout = timeout
         self.interval = int(interval)
         self.procs = str(procs).split(',')
@@ -22,6 +22,7 @@ class ParseToRiemann(object):
         self.limit = limit
         self.syshost = socket.gethostname()
         self.client = Client(self.host, int(self.port))
+        self.attributes = attributes
 
         self.metric = defaultdict(lambda: 0)
         self.status = dict()
@@ -91,7 +92,7 @@ class ParseToRiemann(object):
                 self.client.send(
                     dict(service=send_service, state='ok' if v else 'critical',
                          metric=new_times_running[k], host=self.syshost,
-                         ttl=600))
+                         ttl=600, attributes=self.attributes))
 
         threading.Timer(int(self.interval), self.run).start()
 
@@ -105,8 +106,10 @@ class ParseToRiemann(object):
 @click.option('--directory', '-d', default='/etc/service/', help='Directory')
 @click.option('--limit', '-l', default='100', help='Max number of historical data to store')
 @click.option('--service-name', '-s', default='sv.proc', help = 'Service name')
-def main_cli(timeout, interval, procs, directory, host, port, limit, service_name):
-    parser = ParseToRiemann(timeout, interval, procs, directory, host, port, limit, service_name)
+@click.option('--attribute', '-a', multiple=True, help='Any attributes you want to add homie')
+def main_cli(timeout, interval, procs, directory, host, port, limit, service_name, attribute):
+    attributes = dict(map(lambda x: x.strip().split('='), attribute))
+    parser = ParseToRiemann(timeout, interval, procs, directory, host, port, limit, service_name, attributes)
     parser.run()
 
 
