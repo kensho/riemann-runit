@@ -51,7 +51,7 @@ Riemann runit collector
     install_requires=[
         'bernhard==0.2.3',
         'click==3.3',
-        'protobuf==2.6.1',
+        'protobuf==3.18.3',
         'riemann-client==6.0.2'
     ],
     extras_require={
